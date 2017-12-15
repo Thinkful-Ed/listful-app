@@ -1,23 +1,19 @@
 {
 	"name": "listful-app",
 	"version": "0.0.1",
+	"license": "MIT",
+	"author": "Chris Klanac",
+	"repository": {
+    "type": "git",
+    "url": "git+https://github.com/cklanac/listful-app.git"
+  },
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js",
-		"test": "cross-env NODE_ENV=test mocha"
+		"start": "node server.js"
 	},
 	"dependencies": {
-		"body-parser": "^1.15.2",
 		"cors": "^2.8.4",
-		"express": "^4.12.4",
+		"express": "^4.16.2",
 		"morgan": "^1.9.0"
-	},
-	"license": "MIT",
-	"devDependencies": {
-		"chai": "^4.1.1",
-		"chai-http": "^3.0.0",
-		"chai-spies": "^0.7.1",
-		"cross-env": "^5.1.1",
-		"mocha": "^3.5.3"
 	}
 }

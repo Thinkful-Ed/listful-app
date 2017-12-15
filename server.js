@@ -6,17 +6,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const util = require('util');
 
-const {PORT} = require('./config');
+const { PORT } = require('./config');
 const itemsRouter = require('./routers/itemsRouter');
 
 const app = express();
 
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-  skip: () => process.env.NODE_ENV === 'test'
-}));
-
+app.use(morgan('common'));
 app.use(express.static('public')); // serve static files
-
 app.use(cors());
 app.use(bodyParser.json()); // parse JSON body
 
@@ -49,12 +45,8 @@ app.listenAsync = function (port) {
   });
 };
 
-if (require.main === module) {
-  app.listenAsync(PORT)
-    .then(server => {
-      console.info(`Server listening on port ${server.address().port}`);
-    })
-    .catch(console.error);
-}
-
-module.exports = app; // Export for testing
+app.listenAsync(PORT)
+  .then(server => {
+    console.info(`Server listening on port ${server.address().port}`);
+  })
+  .catch(console.error);
