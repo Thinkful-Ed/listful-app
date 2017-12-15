@@ -1,5 +1,20 @@
-Listful App
+Listful App - RESTful
 ============================
+
+remove `/boom` endpoint
+update simDB to async with callbacks
+Discuss error-first callbacks
+update endpoints invoke simDB with callbacks with error and 404 handlers
+
+update error and 404 handlers to be more sophisticated
+
+REST: Add PUT, PATCH and DELETE endpoints
+
+Update client to support PUT, PATCH and DELETE
+
+Move endpoints to express router and export
+require router and implement using `app.use`
+
 
 curl -X GET http://localhost:8080/v1/items
 

@@ -1,66 +1,122 @@
 'use strict';
 
-// Simple In-Memory Database
+// Simple In-Memory Database (full async-callback version)
 
 const simDB = {
 
-  create: function (newItem) {
-    newItem.id = this.nextVal++;
-    this.data.unshift(newItem);
-    return newItem;
-  },
-
-  find: function (query = {}) {
-    return this.data.filter(item => Object.keys(query).every(key => item[key] === query[key]));
-  },
-
-  findById: function (id) {
-    return this.data.find(item => item.id === Number(id));
-  },
-
-  findByIdAndReplace: function (id, updateItem) {
-    id = Number(id);
-    
-    const index = this.data.findIndex(item => item.id === Number(id));
-    if (index !== -1) {
-      updateItem.id = id;
-      this.data.splice(index, 1, updateItem);
-      return updateItem;
-    }   
-  },
-
-  findByIdAndUpdate: function (id, updateItem) {
-    id = Number(id);
-    let item = this.findById(id);
-    if (item) {
-      Object.assign(item, updateItem);
-    }
-    return item;
-  },
-
-  findByIdAndRemove: function (id) {
-    const index = this.data.findIndex(item => item.id === Number(id));
-    if (index !== -1) {
-      return this.data.splice(index, 1).length;
-    } else {
-      return 0;
-    }
-  },
-
-  initialize: function(data) {
-    this.nextVal = 1000;
-    this.data = data.map(item => {
-      item.id = this.nextVal++;
-      return item;
+  create: function (newItem, callback) {
+    setImmediate(() => {
+      try {
+        newItem.id = this.nextVal++;
+        this.data.unshift(newItem);
+        callback(null, newItem);
+      } catch (err) {
+        callback(err);
+      }
     });
-    return this;
   },
 
-  destroy: function() {    
-    this.nextVal = 1000;
-    this.data = [];
-    return this;
+  find: function (query = {}, callback) {
+    setImmediate(() => {
+      try {
+        let list = this.data.filter(item => Object.keys(query).every(key => item[key] === query[key]));
+        callback(null, list);
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  findById: function (id, callback) {
+    setImmediate(() => {
+      try {
+        let item = this.data.find(item => item.id === Number(id));
+        callback(null, item);
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  findByIdAndReplace: function (id, updateItem, callback) {
+    setImmediate(() => {
+      try {
+        id = Number(id);
+        const index = this.data.findIndex(item => item.id === id);
+        if (index === -1) {
+          callback(null, null);
+        }
+        updateItem.id = id;
+        this.data.splice(index, 1, updateItem);
+        callback(null, updateItem);
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  findByIdAndUpdate: function (id, updateItem, callback) {
+    setImmediate(() => {
+      try {
+        id = Number(id);
+        let item = this.findById(id);
+        if (!item) {
+          callback(null, null);
+        }
+        Object.assign(item, updateItem);
+        callback(null, updateItem);
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  findByIdAndRemove: function (id, callback) {
+    setImmediate(() => {
+      try {
+        const index = this.data.findIndex(item => item.id === Number(id));
+
+        if (index === -1) {
+          callback(null, null);
+        } else {
+          const len = this.data.splice(index, 1).length;
+          callback(null, len);
+        }
+
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  initialize: function (data, callback) {
+    setImmediate(() => {
+      try {
+        this.nextVal = 1000;
+        this.data = data.map(item => {
+          item.id = this.nextVal++;
+          return item;
+        });
+        callback(null, this);
+      } catch (err) {
+        callback(err);
+      }
+    });
+  },
+
+  // NOTE destroy will be used with Mocha/Chai
+  destroy: function(callback) {    
+    setImmediate(() => {
+      try {
+        this.nextVal = 1000;
+        this.data = [];
+        callback(null, this);
+      } catch (err) {
+        callback(err);
+      }
+    });
   }
+
 };
 
 module.exports = Object.create(simDB);
