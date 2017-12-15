@@ -4,10 +4,10 @@
 
 const simDB = {
 
-  create: function (item) {
-    item.id = this.nextVal++;
-    this.data.push(item);
-    return item;
+  create: function (newItem) {
+    newItem.id = this.nextVal++;
+    this.data.unshift(newItem);
+    return newItem;
   },
 
   find: function (query = {}) {
@@ -18,22 +18,22 @@ const simDB = {
     return this.data.find(item => item.id === Number(id));
   },
 
-  findByIdAndReplace: function (id, update) {
+  findByIdAndReplace: function (id, updateItem) {
     id = Number(id);
     
     const index = this.data.findIndex(item => item.id === Number(id));
     if (index !== -1) {
-      update.id = id;
-      this.data.splice(index, 1, update);
-      return update;
+      updateItem.id = id;
+      this.data.splice(index, 1, updateItem);
+      return updateItem;
     }   
   },
 
-  findByIdAndUpdate: function (id, update) {
+  findByIdAndUpdate: function (id, updateItem) {
     id = Number(id);
     let item = this.findById(id);
     if (item) {
-      Object.assign(item, update);
+      Object.assign(item, updateItem);
     }
     return item;
   },

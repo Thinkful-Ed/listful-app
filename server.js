@@ -10,12 +10,8 @@ const itemsRouter = require('./routers/itemsRouter');
 
 const app = express();
 
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-  skip: () => process.env.NODE_ENV === 'test'
-}));
-
+app.use(morgan('common'));
 app.use(express.static('public')); // serve static files
-
 app.use(cors());
 app.use(bodyParser.json()); // parse JSON body
 
