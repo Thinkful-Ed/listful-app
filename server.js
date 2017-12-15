@@ -4,57 +4,59 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const util = require('util');
+const demoAuth = require('../middleware/demoAuth');
+const demoCORS = require('../middleware/demoCORS');
+const demoLogger = require('../middleware/demoLogger');
 
-const {PORT} = require('./config');
-const itemsRouter = require('./routers/itemsRouter');
+const data = require('./db/items');
+const { PORT } = require('./config');
 
 const app = express();
 
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-  skip: () => process.env.NODE_ENV === 'test'
-}));
-
+// Log everything
+app.use(demoLogger);
+app.use(morgan('common'));
 app.use(express.static('public')); // serve static files
-
+app.use(demoCORS);
 app.use(cors());
 app.use(bodyParser.json()); // parse JSON body
 
-app.use('/v1/items', itemsRouter);
-
-// 404 catch-all
-app.use(function (req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.get('/items', (req, res) => {
+  const query = req.query;
+  const list = data.filter(item => Object.keys(query).every(key => item[key] === query[key]));
+  res.json(list);
 });
 
-// Error handler
-// Only show stacktrace if 'env' is 'development'
+app.get('/items/:id', (req, res) => {
+  const id = req.params.id;
+  const item = data[id];
+  res.json(item);
+});
+
+app.post('/items', demoAuth, (req, res) => {
+  const { name, checked } = req.body;
+  const newItem = { name, checked };
+  data.unshift(newItem);
+  res.json(newItem);
+});
+
+app.get('/throw', (req, res) => {
+  throw new Error('Boom!!');
+});
+
+//* Catch-all endpoint if client makes request to non-existent endpoint
+app.use('*', function (req, res) {
+  res.status(404).json({ code: 404, message: 'Not Found' });
+});
+
+//* Catch-all endpoint for errors (see dummy "/throw" endpoint above)
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: (process.env.NODE_ENV === 'development') ? err : {}
-  });
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
-// Promisify .listen() and .close()
-app.listenAsync = function (port) {
-  return new Promise((resolve, reject) => {
-    this.listen(port, function () {
-      this.closeAsync = util.promisify(this.close);
-      resolve(this);
-    }).on('error', reject);
-  });
-};
-
-if (require.main === module) {
-  app.listenAsync(PORT)
-    .then(server => {
-      console.info(`Server listening on port ${server.address().port}`);
-    })
-    .catch(console.error);
-}
-
-module.exports = app; // Export for testing
+app.listen(PORT, function () {
+  console.info(`Server listening on ${this.address().port}`);
+}).on('error', err => {
+  console.error(err);
+});
