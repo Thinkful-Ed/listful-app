@@ -1,7 +1,7 @@
 [
   { "name": "Apples",   "checked": false },
   { "name": "Bananas",  "checked": true },
-  { "name": "Cheries",  "checked": false },
+  { "name": "Cherries",  "checked": false },
   { "name": "Dates",    "checked": true },
   { "name": "Eggplant", "checked": false },
   { "name": "Flour",    "checked": true },

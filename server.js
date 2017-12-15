@@ -4,7 +4,6 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const util = require('util');
 
 const {PORT} = require('./config');
 const itemsRouter = require('./routers/itemsRouter');
@@ -39,22 +38,8 @@ app.use(function (err, req, res, next) {
   });
 });
 
-// Promisify .listen() and .close()
-app.listenAsync = function (port) {
-  return new Promise((resolve, reject) => {
-    this.listen(port, function () {
-      this.closeAsync = util.promisify(this.close);
-      resolve(this);
-    }).on('error', reject);
-  });
-};
-
-if (require.main === module) {
-  app.listenAsync(PORT)
-    .then(server => {
-      console.info(`Server listening on port ${server.address().port}`);
-    })
-    .catch(console.error);
-}
-
-module.exports = app; // Export for testing
+app.listen(PORT, function () {
+  console.info(`Server listening on ${this.address().port}`);
+}).on('error', err => {
+  console.error(err);
+});

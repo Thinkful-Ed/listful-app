@@ -1,3 +1,4 @@
+/* global $ */
 'use strict';
 
 class Api {
@@ -16,98 +17,68 @@ class Api {
     return url;
   }
 
-  _normalizeResponseErrors(res) {
-    if (!res.ok) {
-      if (
-        res.headers.has('content-type') &&
-        res.headers.get('content-type').startsWith('application/json')
-      ) {
-        return res.json().then(err => Promise.reject(err));
-      }
-      return Promise.reject({
-        status: res.status,
-        message: res.statusText
-      });
-    }
-    return res;
-  }
-
-  create(document) {
+  create(obj, success) {
     const url = this._buildUrl(this.path);
-
-    return fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: document ? JSON.stringify(document) : null
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.json());
+    return $.ajax({
+      type: 'POST',
+      url: url,
+      data: obj ? JSON.stringify(obj) : null,
+      dataType: 'json',
+      contentType: 'application/json',
+      success: success
+    });
   }
 
-  search(query) {
+  search(query, success) {
     const url = this._buildUrl(this.path, query);
-
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.json());
-  }  
-
-  details(id) {
-    const url = this._buildUrl(`${this.path}/${id}`);
-
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.json());
+    return $.ajax({
+      type: 'GET',
+      url: url,
+      data: query,
+      success: success
+    });
   }
 
-  replace(id, obj) {
+  details(id, success) {
     const url = this._buildUrl(`${this.path}/${id}`);
-
-    return fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: obj ? JSON.stringify(obj) : null
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.json());
+    return $.ajax({
+      type: 'GET',
+      url: url,
+      success: success
+    });
   }
 
-  update(id, obj) {
+  replace(id, obj, success) {
     const url = this._buildUrl(`${this.path}/${id}`);
-
-    return fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: obj ? JSON.stringify(obj) : null
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.json());
+    return $.ajax({
+      type: 'PUT',
+      url: url,
+      data: obj ? JSON.stringify(obj) : null,
+      dataType: 'json',
+      contentType: 'application/json',
+      success: success
+    });
   }
 
-  remove(id) {
+  update(id, obj, success) {
     const url = this._buildUrl(`${this.path}/${id}`);
+    return $.ajax({
+      type: 'PATCH',
+      url: url,
+      data: obj ? JSON.stringify(obj) : null,
+      dataType: 'json',
+      contentType: 'application/json',
+      success: success
+    });
+  }
 
-    return fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).then(this._normalizeResponseErrors)
-      .then(res => res.text());
+  remove(id, success) {
+    const url = this._buildUrl(`${this.path}/${id}`);
+    return $.ajax({
+      type: 'DELETE',
+      url: url,
+      success: success
+    });
   }
   
 }
