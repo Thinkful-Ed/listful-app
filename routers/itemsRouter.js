@@ -7,76 +7,121 @@ const data = require('../db/items');
 const simDB = require('../db/simDB');
 const items = simDB.initialize(data);
 
-// ===== ITEMS ======
-
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   const query = req.query;
-  const list = items.find(query);
-  res.json(list);
+  items.findAsync(query)
+    .then(list => {
+      res.json(list);
+    })
+    .catch(next);
 });
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
-  const item = items.findById(id);
-  if (!item) { return next(); }
-  res.json(item);
+
+  items.findByIdAsync(id)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      } else {
+        next(); // 404 handler
+      }
+    })
+    .catch(next);  // error handler
 });
 
 router.post('/', (req, res, next) => {
   const { name, checked } = req.body;
+
+  /***** Never trust users - validate input *****/
   if (!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
-    return next(err);
+    return next(err); // error handler
   }
-  const item = items.create({ name, checked });
-  res.location(`http://${req.headers.host}/items/${item.id}`).status(201).json(item);
+  const newItem = { name, checked };
+
+  // create
+  items.createAsync(newItem)
+    .then(item => {
+      if (item) {
+        res.location(`http://${req.headers.host}/items/${item.id}`).status(201).json(item);
+      } else {
+        next(); // 404 handler
+      }
+    })
+    .catch(next);  // error handler
 });
 
 router.put('/:id', (req, res, next) => {
   const id = req.params.id;
 
-  const toUpdate = {};
+  /***** Never trust users - validate input *****/
+  const updateItem = {};
   const updateableFields = ['name', 'checked'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
-      toUpdate[field] = req.body[field];
+      updateItem[field] = req.body[field];
     }
   });
 
-  if (!toUpdate.name) {
+  /***** Never trust users - validate input *****/
+  if (!updateItem.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
-    return next(err);
+    return next(err); // error handler
   }
-  const item = items.findByIdAndReplace(id, toUpdate); // replace
-  if (!item) { return next(); }
-  res.json(item);
+
+  // replace
+  items.findByIdAndUpdateAsync(id, updateItem)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      } else {
+        next(); // 404 handler
+      }
+    })
+    .catch(next); // error handler
 });
 
 router.patch('/:id', (req, res, next) => {
   const id = req.params.id;
 
-  const toUpdate = {};
+  /***** Never trust users - validate input *****/
+  const replaceItem = {};
   const updateableFields = ['name', 'checked'];
-
+  
   updateableFields.forEach(field => {
     if (field in req.body) {
-      toUpdate[field] = req.body[field];
+      replaceItem[field] = req.body[field];
     }
   });
 
-  const item = items.findByIdAndUpdate(id, toUpdate); // update
-  if (!item) { return next(); }
-  res.json(item);
+  // update
+  items.findByIdAndReplaceAsync(id, replaceItem)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      } else {
+        next(); // 404 handler
+      }
+    })
+    .catch(next); // error handler
 });
 
 router.delete('/:id', (req, res, next) => {
   const id = req.params.id;
-  const result = items.findByIdAndRemove(id);
-  if (!result) { return next(); }
-  res.sendStatus(204);
+
+  items.findByIdAndRemoveAsync(id)
+    .then(count => {
+      if (count) {
+        res.status(204).end();
+      } else {
+        next(); // 404 handler
+      }
+    })
+    .catch(next); // error handler
 });
 
 module.exports = router;
