@@ -13,25 +13,18 @@ class Render {
     $('#' + this.store.view).show();
   }
 
-  generateItemElement(item) {
-    //<span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+  generateItemElement(item, index) {
     return `
-    <li class="js-item-id-element" data-item-id="${item.id}">
-      <input name="shopping-item" value="${item.name}" ${item.checked ? 'disabled' : ''}
-        class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}"></input>
-      <div class="shopping-item-controls">
-        <button class="shopping-item-toggle js-item-toggle">
-            <span class="button-label">check</span>
-        </button>
-        <button class="shopping-item-delete js-item-delete">
-            <span class="button-label">delete</span>
-        </button>
-      </div>
+    <li class="js-item-id-element" data-item-id="${index}">
+
+    <span class="shopping-item js-shopping-item
+      ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+            
     </li>`;
   }
 
   shoppingList() {
-    const listOfItems = this.store.data.map((item) => this.generateItemElement(item));
+    const listOfItems = this.store.data.map((item, index) => this.generateItemElement(item, index));
     $('.js-shopping-list').html(listOfItems.join(''));
   }
 

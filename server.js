@@ -1,60 +1,46 @@
 'use strict';
 
 const express = require('express');
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-const util = require('util');
-
-const {PORT} = require('./config');
-const itemsRouter = require('./routers/itemsRouter');
-
+const data = require('./db/items');
 const app = express();
 
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-  skip: () => process.env.NODE_ENV === 'test'
-}));
+// app.get('/index.html', (req, res) => {
+//   res.sendFile(__dirname + '/public/index.html');
+// });
+
+// app.get('/style.css', (req, res) => {
+//   //set headers?
+//   res.sendFile(__dirname + '/public/style.css');
+// });
+
+// app.get('/script.js', (req, res) => {
+//   //set headers?
+//   res.sendFile(__dirname + '/public/script.js');
+// });
 
 app.use(express.static('public')); // serve static files
-
-app.use(cors());
 app.use(bodyParser.json()); // parse JSON body
 
-app.use('/v1/items', itemsRouter);
-
-// 404 catch-all
-app.use(function (req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.get('/items', (req, res) => {
+  const query = req.query;
+  const list = data.filter(item => Object.keys(query).every(key => item[key] === query[key]));
+  res.json(list);
 });
 
-// Error handler
-// Only show stacktrace if 'env' is 'development'
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: (process.env.NODE_ENV === 'development') ? err : {}
-  });
+app.get('/items/:id', (req, res) => {
+  const id = req.params.id;
+  const item = data[id];
+  res.json(item);
 });
 
-// Promisify .listen() and .close()
-app.listenAsync = function (port) {
-  return new Promise((resolve, reject) => {
-    this.listen(port, function () {
-      this.closeAsync = util.promisify(this.close);
-      resolve(this);
-    }).on('error', reject);
-  });
-};
+app.post('/items', (req, res) => {
+  const { name, checked } = req.body;  
+  const newItem = { name, checked };
+  data.unshift(newItem);
+  res.json(newItem);
+});
 
-if (require.main === module) {
-  app.listenAsync(PORT)
-    .then(server => {
-      console.info(`Server listening on port ${server.address().port}`);
-    })
-    .catch(console.error);
-}
-
-module.exports = app; // Export for testing
+app.listen(8080, function () {
+  console.info(`Server listening on ${this.address().port}`);
+}).on('error', console.error);
