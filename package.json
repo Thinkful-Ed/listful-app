@@ -4,9 +4,9 @@
 	"license": "MIT",
 	"author": "Chris Klanac",
 	"repository": {
-    "type": "git",
-    "url": "git+https://github.com/cklanac/listful-app.git"
-  },
+		"type": "git",
+		"url": "git+https://github.com/cklanac/listful-app.git"
+	},
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js"

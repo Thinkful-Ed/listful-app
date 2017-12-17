@@ -5,7 +5,10 @@ const router = express.Router();
 
 const data = require('../db/items');
 const simDB = require('../db/simDB');
-const items = simDB.initialize(data);
+
+let items;
+simDB.initializeAsync(data)
+  .then(data => items = data);
 
 router.get('/', (req, res, next) => {
   const query = req.query;
@@ -57,24 +60,24 @@ router.put('/:id', (req, res, next) => {
   const id = req.params.id;
 
   /***** Never trust users - validate input *****/
-  const updateItem = {};
+  const replaceItem = {};
   const updateableFields = ['name', 'checked'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
-      updateItem[field] = req.body[field];
+      replaceItem[field] = req.body[field];
     }
   });
 
   /***** Never trust users - validate input *****/
-  if (!updateItem.name) {
+  if (!replaceItem.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err); // error handler
   }
 
   // replace
-  items.findByIdAndUpdateAsync(id, updateItem)
+  items.findByIdAndReplaceAsync(id, replaceItem)
     .then(item => {
       if (item) {
         res.json(item);
@@ -99,7 +102,7 @@ router.patch('/:id', (req, res, next) => {
   });
 
   // update
-  items.findByIdAndReplaceAsync(id, replaceItem)
+  items.findByIdAndUpdateAsync(id, replaceItem)
     .then(item => {
       if (item) {
         res.json(item);

@@ -5,7 +5,7 @@ const api = new Api('/v1/items');
 const store = new Store();
 const render = new Render(store, api);
 
-$(function () {
+$(() => {
 
   api.search()
     .then(response => {
@@ -14,7 +14,7 @@ $(function () {
     })
     .catch(console.error);
 
-  $('#js-shopping-list-form').submit(function (event) {
+  $('#js-shopping-list-form').submit(event => {
     event.preventDefault();
 
     const inputForm = $(event.currentTarget);

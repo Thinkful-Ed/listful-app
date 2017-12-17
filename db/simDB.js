@@ -32,7 +32,8 @@ const simDB = {
   findById: function (id, callback) {
     setImmediate(() => {
       try {
-        let item = this.data.find(item => item.id === Number(id));
+        id = Number(id);
+        let item = this.data.find(item => item.id === id);
         callback(null, item);
       } catch (err) {
         callback(err);
@@ -40,7 +41,7 @@ const simDB = {
     });
   },
 
-  findByIdAndReplace: function (id, updateItem, callback) {
+  findByIdAndReplace: function (id, replaceItem, callback) {
     setImmediate(() => {
       try {
         id = Number(id);
@@ -48,9 +49,9 @@ const simDB = {
         if (index === -1) {
           callback(null, null);
         }
-        updateItem.id = id;
-        this.data.splice(index, 1, updateItem);
-        callback(null, updateItem);
+        replaceItem.id = id;
+        this.data.splice(index, 1, replaceItem);
+        callback(null, replaceItem);
       } catch (err) {
         callback(err);
       }
@@ -61,12 +62,12 @@ const simDB = {
     setImmediate(() => {
       try {
         id = Number(id);
-        let item = this.findById(id);
+        let item = this.data.find(item => item.id === id);
         if (!item) {
           callback(null, null);
         }
         Object.assign(item, updateItem);
-        callback(null, updateItem);
+        callback(null, item);
       } catch (err) {
         callback(err);
       }
@@ -76,15 +77,14 @@ const simDB = {
   findByIdAndRemove: function (id, callback) {
     setImmediate(() => {
       try {
-        const index = this.data.findIndex(item => item.id === Number(id));
-
+        id = Number(id);
+        const index = this.data.findIndex(item => item.id === id);
         if (index === -1) {
           callback(null, null);
         } else {
           const len = this.data.splice(index, 1).length;
           callback(null, len);
         }
-
       } catch (err) {
         callback(err);
       }

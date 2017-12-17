@@ -7,7 +7,7 @@ const cors = require('cors');
 const util = require('util');
 
 const { PORT } = require('./config');
-const itemsRouter = require('./routers/itemsRouter');
+const itemsRouter = require('./routers/items.router');
 
 const app = express();
 
