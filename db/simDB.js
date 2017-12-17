@@ -6,7 +6,6 @@
 // find
 // findById
 
-
 const simDB = {
 
   create: function (newItem) {
@@ -20,7 +19,8 @@ const simDB = {
   },
 
   findById: function (id) {
-    return this.data.find(item => item.id === Number(id));
+    id = Number(id);
+    return this.data.find(item => item.id === id);
   },
 
   initialize: function(data) {
