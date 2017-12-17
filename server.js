@@ -6,8 +6,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const util = require('util');
 
-const {PORT} = require('./config');
-const itemsRouter = require('./routers/itemsRouter');
+const { PORT } = require('./config');
+const itemsRouter = require('./items/items.router');
 
 const app = express();
 
@@ -55,11 +55,14 @@ app.listenAsync = function (port) {
  * Prevents error: "Trying to open unclosed connection." when running mocha tests
  */
 if (require.main === module) {
-  app.listenAsync(PORT)
-    .then(server => {
+  (async () => {
+    try {
+      const server = await app.listenAsync(PORT);
       console.info(`Server listening on port ${server.address().port}`);
-    })
-    .catch(console.error);
+    } catch (err) {
+      console.error(err);
+    }
+  })();    
 }
 
 module.exports = app; // Export for testing
