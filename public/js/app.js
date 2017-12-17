@@ -5,14 +5,14 @@ const api = new Api('/items');
 const store = new Store();
 const render = new Render(store, api);
 
-$(function () {
+$(() => {
 
   api.search({}, response => {
     store.data = response;
     render.shoppingList();
   });
 
-  $('#js-shopping-list-form').submit(function (event) {
+  $('#js-shopping-list-form').submit(event => {
     event.preventDefault();
 
     const inputForm = $(event.currentTarget);
