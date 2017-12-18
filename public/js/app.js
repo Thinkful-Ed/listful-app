@@ -11,7 +11,7 @@ $(() => {
     store.data = response;
     render.shoppingList();
   });
-
+  
   $('#js-shopping-list-form').submit(event => {
     event.preventDefault();
 

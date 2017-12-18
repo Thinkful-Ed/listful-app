@@ -16,6 +16,16 @@ class Api {
 
     return url;
   }
+  
+  search(query, success) {
+    const url = this._buildUrl(this.path, query);
+    return $.ajax({
+      type: 'GET',
+      url: url,
+      data: query,
+      success: success
+    });
+  }
 
   create(obj, success) {
     const url = this._buildUrl(this.path);
@@ -29,53 +39,10 @@ class Api {
     });
   }
 
-  search(query, success) {
-    const url = this._buildUrl(this.path, query);
-    return $.ajax({
-      type: 'GET',
-      url: url,
-      data: query,
-      success: success
-    });
-  }
-
   details(id, success) {
     const url = this._buildUrl(`${this.path}/${id}`);
     return $.ajax({
       type: 'GET',
-      url: url,
-      success: success
-    });
-  }
-
-  replace(id, obj, success) {
-    const url = this._buildUrl(`${this.path}/${id}`);
-    return $.ajax({
-      type: 'PUT',
-      url: url,
-      data: obj ? JSON.stringify(obj) : null,
-      dataType: 'json',
-      contentType: 'application/json',
-      success: success
-    });
-  }
-
-  update(id, obj, success) {
-    const url = this._buildUrl(`${this.path}/${id}`);
-    return $.ajax({
-      type: 'PATCH',
-      url: url,
-      data: obj ? JSON.stringify(obj) : null,
-      dataType: 'json',
-      contentType: 'application/json',
-      success: success
-    });
-  }
-
-  remove(id, success) {
-    const url = this._buildUrl(`${this.path}/${id}`);
-    return $.ajax({
-      type: 'DELETE',
       url: url,
       success: success
     });
