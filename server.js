@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const bodyParser = require('body-parser');
+
 const app = express();
 
 const data = [
@@ -18,7 +18,7 @@ const data = [
 ];
 
 app.use(express.static('public')); // serve static files
-app.use(bodyParser.json()); // parse JSON body
+app.use(express.json()); // parse JSON body
 
 app.get('/items', (req, res) => {
   const query = req.query;

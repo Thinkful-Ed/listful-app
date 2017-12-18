@@ -19,7 +19,6 @@ class Render {
 
     <span class="shopping-item js-shopping-item
       ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
-            
     </li>`;
   }
 
