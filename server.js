@@ -2,7 +2,7 @@
 
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
+
 const cors = require('cors');
 const util = require('util');
 
@@ -14,7 +14,7 @@ const app = express();
 app.use(morgan('common'));
 app.use(express.static('public')); // serve static files
 app.use(cors());
-app.use(bodyParser.json()); // parse JSON body
+app.use(express.json()); // parse JSON body
 
 app.use('/v1/items', itemsRouter);
 
