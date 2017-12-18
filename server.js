@@ -5,20 +5,6 @@ const bodyParser = require('body-parser');
 const data = require('./db/items');
 const app = express();
 
-// app.get('/index.html', (req, res) => {
-//   res.sendFile(__dirname + '/public/index.html');
-// });
-
-// app.get('/style.css', (req, res) => {
-//   //set headers?
-//   res.sendFile(__dirname + '/public/style.css');
-// });
-
-// app.get('/script.js', (req, res) => {
-//   //set headers?
-//   res.sendFile(__dirname + '/public/script.js');
-// });
-
 app.use(express.static('public')); // serve static files
 app.use(bodyParser.json()); // parse JSON body
 
