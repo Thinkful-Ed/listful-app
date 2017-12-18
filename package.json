@@ -12,7 +12,8 @@
 		"start": "node server.js",
 		"test": "cross-env NODE_ENV=test mocha */*.test.js",
 		"dev:start": "nodemon server.js",
-		"dev:test": "nodemon --exec npm test"
+		"dev:test": "nodemon --exec npm test",
+		"dev:cover": "nodemon --exec nyc --reporter=lcov --reporter=text-summary npm test"
 	},
 	"dependencies": {
 		"cors": "^2.8.4",
