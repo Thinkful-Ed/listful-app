@@ -10,7 +10,7 @@ const simDB = {
 
   create: function (newItem) {
     newItem.id = this.nextVal++;
-    this.data.unshift(newItem);
+    this.data.unshift(newItem); // unshift for nice display (not performance)
     return newItem;
   },
 

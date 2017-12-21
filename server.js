@@ -28,11 +28,6 @@ app.use(cors());
 
 app.use(express.json()); // parse JSON body
 
-// TEMP: just to test error handler
-app.get('/throw', (req, res) => {
-  throw new Error('Boom!!');
-});
-
 app.get('/items', (req, res) => {
   const query = req.query;
   const list = items.find(query);
@@ -66,14 +61,14 @@ app.post('/items', demoAuth, (req, res, next) => {
 });
 
 //* Catch-all endpoint if client makes request to non-existent endpoint
-app.use('*', function (req, res) {
+app.use((req, res) => {
   res.status(404).json({ code: 404, message: 'Not Found' });
 });
 
 //* Catch-all endpoint for errors (see dummy "/throw" endpoint above)
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).json({ message: 'Something broke!' });
 });
 
 app.listen(PORT, function () {
