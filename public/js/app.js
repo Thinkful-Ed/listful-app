@@ -18,7 +18,7 @@ $(() => {
     event.preventDefault();
 
     const inputForm = $(event.currentTarget);
-    const newItemInput = inputForm.find('input[name=shopping-list-input]');
+    const newItemInput = inputForm.find('.js-shopping-list-input');
 
     api.create({ name: newItemInput.val() })
       .then(response => {
