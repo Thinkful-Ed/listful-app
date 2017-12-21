@@ -8,11 +8,6 @@ class Render {
     this.api = api;
   }
 
-  page() {
-    $('.js-page-view').hide();
-    $('#' + this.store.view).show();
-  }
-
   generateItemElement(item, index) {
     return `
     <li class="js-item-id-element" data-item-id="${index}">
