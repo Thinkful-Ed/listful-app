@@ -8,7 +8,7 @@ const simDB = {
     setImmediate(() => {
       try {
         newItem.id = this.nextVal++;
-        this.data.unshift(newItem);
+        this.data.unshift(newItem); // unshift for nice display (not performance)
         callback(null, newItem);
       } catch (err) {
         callback(err);
@@ -75,7 +75,7 @@ const simDB = {
   findByIdAndRemove: function (id, callback) {
     setImmediate(() => {
       try {
-        id = Number(id);
+        id = Number(id);        
         const index = this.data.findIndex(item => item.id === id);
         if (index === -1) {
           callback(null, null);

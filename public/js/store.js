@@ -5,8 +5,6 @@ class Store {
   //  but it does provide a nice way of documenting the fields
   constructor() {
     this.data = null;
-    this.view = null;
-    this.query = null;
   }
 
   findById(id) {
@@ -14,12 +12,7 @@ class Store {
   }
 
   findByIdAndRemove(id) {
-    const index = this.data.findIndex(item => item.id === Number(id));
-    if (index !== -1) {
-      return this.data.splice(index, 1).length;
-    } else {
-      return 0;
-    }
+    this.data = this.data.filter(item => item.id !== Number(id));
   }
 
   findByIdAndUpdate(id, update) {

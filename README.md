@@ -1,6 +1,19 @@
 Listful App - RESTful
 ============================
 
+W3D3A RESTful Guidelines
+------------------------
+
+### Add `storage` dummy database
+Before we begin we need to add a dummy database to the app
+
+W3D3P Express Router
+--------------------
+
+
+
+
+
 remove `/boom` endpoint
 update simDB to async with callbacks
 Discuss error-first callbacks
