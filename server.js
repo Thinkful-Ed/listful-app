@@ -1,53 +1,60 @@
 'use strict';
 
 const express = require('express');
-const morgan = require('morgan');
 
-const cors = require('cors');
-
-const data = require('../db/items');
-const simDB = require('../db/simDB');
+// TEMP: Simple In-Memory Database
+const data = require('./db/api/items');
+const simDB = require('./db/simDB');
 const items = simDB.initialize(data);
 
-const demoAuth = require('../middleware/demoAuth');
-const demoCORS = require('../middleware/demoCORS');
-const demoLogger = require('../middleware/demoLogger');
+const logger = require('./middleware/logger');
 
 const { PORT } = require('./config');
 
+// Create an Express application
 const app = express();
 
-// Log everything
-// app.use(demoLogger);
-app.use(morgan('common'));
+// Log all requests
+app.use(logger);
 
-app.use(express.static('public')); // serve static files
+// Create a static webserver
+app.use(express.static('public'));
 
-// app.use(demoCORS);
-app.use(cors());
+// Parse request body
+app.use(express.json());
 
-app.use(express.json()); // parse JSON body
-
-app.get('/items', (req, res) => {
+// Get All items (and search by query)
+app.get('/api/items', (req, res, next) => {
   const query = req.query;
-  const list = items.find(query);
-  res.json(list);
+
+  items.find(query, (err, list) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(list);
+  });
 });
 
-app.get('/items/:id', (req, res, next) => {
+// Get a single item
+app.get('/api/items/:id', (req, res, next) => {
   const id = req.params.id;
 
-  const item = items.findById(id);
-  if (item) {
-    res.json(item);
-  } else {
-    next(); // fall-through to 404 handler
-  }
+  items.findById(id, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next(); 
+    }
+  });
 });
 
-app.post('/items', demoAuth, (req, res, next) => {
+// Post (insert) an item
+app.post('/api/items', (req, res, next) => {
   const { name, checked } = req.body;
-
+  
   /***** Never trust users - validate input *****/
   if (!req.body.name) {
     const err = new Error('Missing `name` in request body');
@@ -55,22 +62,42 @@ app.post('/items', demoAuth, (req, res, next) => {
     return next(err);
   }
   const newObj = { name, checked };
-
-  const newItem = items.create(newObj);
-  res.json(newItem);
+  
+  items.create(newObj, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next(); 
+    }
+  });
 });
 
-//* Catch-all endpoint if client makes request to non-existent endpoint
-app.use((req, res) => {
-  res.status(404).json({ code: 404, message: 'Not Found' });
+// TEMP: just to test error handler
+app.get('/throw', (req, res, next) => {
+  throw new Error('Boom!!');
 });
 
-//* Catch-all endpoint for errors (see dummy "/throw" endpoint above)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something broke!' });
+// Catch-all 404
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
+// Catch-all Error handler
+// NOTE: we'll prevent stacktrace leak in later exercise
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: err 
+  });
+});
+
+// Listen for incoming connections
 app.listen(PORT, function () {
   console.info(`Server listening on ${this.address().port}`);
 }).on('error', err => {
