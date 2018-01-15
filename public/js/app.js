@@ -29,7 +29,6 @@ $(() => {
       store.data.unshift(response);
       render.shoppingList();
     } catch (err) {
-      console.log('catching err', err)
       console.error(err);
     }
   });

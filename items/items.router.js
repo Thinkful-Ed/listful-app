@@ -1,8 +1,10 @@
 'use strict';
 
 const express = require('express');
-const router = express.Router();
 const itemsCtrl = require('./items.controller');
+
+// Create an router instance (aka "mini-app")
+const router = express.Router();
 
 router.route('/')
   .get(itemsCtrl.list) // GET/READ ALL ITEMS

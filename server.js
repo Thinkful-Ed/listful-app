@@ -3,33 +3,35 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const cors = require('cors');
-const util = require('util');
-
 const { PORT } = require('./config');
-const itemsRouter = require('./items/items.router');
+const itemsRouter = require('./routers/items.router');
 
+// Create an Express application
 const app = express();
 
+// Log all requests. Skip logging during
 app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
   skip: () => process.env.NODE_ENV === 'test'
 }));
 
-app.use(express.static('public')); // serve static files
-app.use(cors());
-app.use(express.json()); // parse JSON body
+// Create a static webserver
+app.use(express.static('public'));
 
-app.use('/v1/items', itemsRouter);
+// Parse request body
+app.use(express.json());
 
-// 404 catch-all
+// Mount router on "/api"
+app.use('/api', itemsRouter);
+
+// Catch-all 404
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// Error handler
-// Only show stacktrace if 'env' is 'development'
+// Catch-all Error handler
+// Add NODE_ENV check to prevent stacktrace leak
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({
@@ -38,31 +40,12 @@ app.use(function (err, req, res, next) {
   });
 });
 
-// Promisify .listen() and .close()
-app.listenAsync = function (port) {
-  return new Promise((resolve, reject) => {
-    this.listen(port, function () {
-      this.closeAsync = util.promisify(this.close);
-      resolve(this);
-    }).on('error', reject);
-  });
-};
-
-/** NOTE:
- * if (require.main === module) ...
- * Block only executes if `server.js` is executed using `npm start` or `node server.js`
- * Block does not execute when required like `require('./server');`
- * Prevents error: "Trying to open unclosed connection." when running mocha tests
- */
 if (require.main === module) {
-  (async () => {
-    try {
-      const server = await app.listenAsync(PORT);
-      console.info(`Server listening on port ${server.address().port}`);
-    } catch (err) {
-      console.error(err);
-    }
-  })();    
+  app.listen(PORT, function () {
+    console.info(`Server listening on ${this.address().port}`);
+  }).on('error', err => {
+    console.error(err);
+  });  
 }
 
 module.exports = app; // Export for testing

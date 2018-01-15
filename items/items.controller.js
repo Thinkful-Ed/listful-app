@@ -3,25 +3,25 @@
 const data = require('../db/items');
 const simDB = require('../db/simDB');
 
-
+// TEMP: Simple In-Memory Database
 let items;
 (async () => {
   items = await simDB.initializeAsync(data);
 })();
 
+// Get All items (and search by query)
 const list = async (req, res, next) => {
   const query = req.query;
 
   try {
     const list = await items.findAsync(query);
     res.json(list);
-    // res.send('asdfasdf');
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
-
 };
 
+// Get a single item
 const detail = async (req, res, next) => {
   const id = req.params.id;
 
@@ -30,13 +30,14 @@ const detail = async (req, res, next) => {
     if (item) {
       res.json(item);
     } else {
-      next(); // 404 handler
+      next(); 
     }
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
 };
 
+// Post (insert) an item
 const create = async (req, res, next) => {
   const { name, checked } = req.body;
 
@@ -44,23 +45,23 @@ const create = async (req, res, next) => {
   if (!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
-    return next(err); // error handler
+    return next(err); 
   }
   const newItem = { name, checked };
 
-  // create
   try {
     const item = await items.createAsync(newItem);
     if (item) {
       res.location(`http://${req.headers.host}/items/${item.id}`).status(201).json(item);
     } else {
-      next(); // 404 handler
+      next(); 
     }
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
 };
 
+// Put (replace) an item
 const update = async (req, res, next) => {
   const id = req.params.id;
 
@@ -74,19 +75,19 @@ const update = async (req, res, next) => {
     }
   });
 
-  // update
   try {
     const item = await items.findByIdAndUpdateAsync(id, updateItem);
     if (item) {
       res.json(item);
     } else {
-      next(); // 404 handler
+      next(); 
     }
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
 };
 
+// Patch (update) an item
 const replace = async (req, res, next) => {
   const id = req.params.id;
 
@@ -100,20 +101,19 @@ const replace = async (req, res, next) => {
     }
   });
 
-  // replace
   try {
     const item = await items.findByIdAndReplaceAsync(id, replaceItem);
     if (item) {
       res.json(item);
     } else {
-      next(); // 404 handler
+      next(); 
     }
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
-
 };
 
+// Delete an item
 const remove = async (req, res, next) => {
   const id = req.params.id;
 
@@ -122,10 +122,10 @@ const remove = async (req, res, next) => {
     if (count) {
       res.status(204).end();
     } else {
-      next(); // 404 handler
+      next(); 
     }
   } catch (err) {
-    next(err); // error handler
+    next(err); 
   }
 };
 
