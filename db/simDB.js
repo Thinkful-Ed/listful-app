@@ -47,7 +47,7 @@ const simDB = {
         id = Number(id);
         const index = this.data.findIndex(item => item.id === id);
         if (index === -1) {
-          callback(null, null);
+          return callback(null, null);
         }
         replaceItem.id = id;
         this.data.splice(index, 1, replaceItem);
@@ -64,7 +64,7 @@ const simDB = {
         id = Number(id);
         let item = this.data.find(item => item.id === id);
         if (!item) {
-          callback(null, null);
+          return callback(null, null);
         }
         Object.assign(item, updateItem);
         callback(null, item);
@@ -80,10 +80,10 @@ const simDB = {
         id = Number(id);
         const index = this.data.findIndex(item => item.id === id);
         if (index === -1) {
-          callback(null, null);
+          return callback(null, null);
         } else {
           const len = this.data.splice(index, 1).length;
-          callback(null, len);
+          return callback(null, len);
         }
       } catch (err) {
         callback(err);
@@ -107,7 +107,7 @@ const simDB = {
   },
 
   // NOTE destroy will be used with testing 
-  destroy: function(callback) {
+  destroy: function (callback) {
     setImmediate(() => {
       try {
         this.nextVal = 1000;

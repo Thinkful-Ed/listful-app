@@ -1,16 +1,19 @@
 'use strict';
 
 const express = require('express');
+
+// Create an router instance (aka "mini-app")
 const router = express.Router();
 
+// TEMP: Simple In-Memory Database
 const data = require('../db/items');
 const simDB = require('../db/simDB');
-
 let items;
 simDB.initializeAsync(data)
   .then(data => items = data);
 
-router.get('/', (req, res, next) => {
+// Get All items (and search by query)
+router.get('/items', (req, res, next) => {
   const query = req.query;
   items.findAsync(query)
     .then(list => {
@@ -19,7 +22,8 @@ router.get('/', (req, res, next) => {
     .catch(next);
 });
 
-router.get('/:id', (req, res, next) => {
+// Get a single item
+router.get('/items/:id', (req, res, next) => {
   const id = req.params.id;
 
   items.findByIdAsync(id)
@@ -27,36 +31,37 @@ router.get('/:id', (req, res, next) => {
       if (item) {
         res.json(item);
       } else {
-        next(); // 404 handler
+        next();
       }
     })
-    .catch(next);  // error handler
+    .catch(next); 
 });
 
-router.post('/', (req, res, next) => {
+// Post (insert) an item
+router.post('/items/', (req, res, next) => {
   const { name, checked } = req.body;
 
   /***** Never trust users - validate input *****/
   if (!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
-    return next(err); // error handler
+    return next(err);
   }
   const newItem = { name, checked };
 
-  // create
   items.createAsync(newItem)
     .then(item => {
       if (item) {
         res.location(`http://${req.headers.host}/items/${item.id}`).status(201).json(item);
       } else {
-        next(); // 404 handler
+        next();
       }
     })
-    .catch(next);  // error handler
+    .catch(next); 
 });
 
-router.put('/:id', (req, res, next) => {
+// Put (replace) an item
+router.put('/items/:id', (req, res, next) => {
   const id = req.params.id;
 
   /***** Never trust users - validate input *****/
@@ -73,22 +78,22 @@ router.put('/:id', (req, res, next) => {
   if (!replaceItem.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
-    return next(err); // error handler
+    return next(err);
   }
 
-  // replace
   items.findByIdAndReplaceAsync(id, replaceItem)
     .then(item => {
       if (item) {
         res.json(item);
       } else {
-        next(); // 404 handler
+        next();
       }
     })
-    .catch(next); // error handler
+    .catch(next);
 });
 
-router.patch('/:id', (req, res, next) => {
+// Patch (update) an item
+router.patch('/items/:id', (req, res, next) => {
   const id = req.params.id;
 
   /***** Never trust users - validate input *****/
@@ -101,19 +106,19 @@ router.patch('/:id', (req, res, next) => {
     }
   });
 
-  // update
   items.findByIdAndUpdateAsync(id, replaceItem)
     .then(item => {
       if (item) {
         res.json(item);
       } else {
-        next(); // 404 handler
+        next();
       }
     })
-    .catch(next); // error handler
+    .catch(next);
 });
 
-router.delete('/:id', (req, res, next) => {
+// Delete an item
+router.delete('/items/:id', (req, res, next) => {
   const id = req.params.id;
 
   items.findByIdAndRemoveAsync(id)
@@ -121,10 +126,10 @@ router.delete('/:id', (req, res, next) => {
       if (count) {
         res.status(204).end();
       } else {
-        next(); // 404 handler
+        next();
       }
     })
-    .catch(next); // error handler
+    .catch(next);
 });
 
 module.exports = router;
