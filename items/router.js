@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const itemsCtrl = require('./items.controller');
+const itemsCtrl = require('./controller');
 
 // Create an router instance (aka "mini-app")
 const router = express.Router();
