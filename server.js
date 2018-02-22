@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const data = require('./db/api/items');
+const data = require('./db/items');
 
 // Create an Express application
 const app = express();
@@ -31,7 +31,7 @@ app.get('/api/items/:id', (req, res) => {
 app.post('/api/items', (req, res) => {
   const { name, checked } = req.body;  
   const newItem = { name, checked };
-  data.unshift(newItem);
+  data.push(newItem);
   res.json(newItem);
 });
 
