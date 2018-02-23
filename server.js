@@ -4,7 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const { PORT } = require('./config');
-const itemsRouter = require('./api/items.router');
+const notesRouter = require('./routes/items');
 
 // Create an Express application
 const app = express();
