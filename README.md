@@ -1,2 +1,2 @@
-Listful App - async-await and feature organization
-============================
+Listful App - async-await
+=========================

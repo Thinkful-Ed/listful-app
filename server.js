@@ -4,7 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const { PORT } = require('./config');
-const notesRouter = require('./routes/items');
+const itemsRouter = require('./routes/items');
 
 // Create an Express application
 const app = express();
@@ -30,7 +30,7 @@ app.use(function (req, res, next) {
   next(err);
 });
 
-// Catch-all Error handler
+// Catch-all Error handle
 // Add NODE_ENV check to prevent stacktrace leak
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
@@ -45,7 +45,7 @@ if (require.main === module) {
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => {
     console.error(err);
-  });  
+  });
 }
 
 module.exports = app; // Export for testing
