@@ -12,21 +12,29 @@ const itemRouter = require('./routers/item.router');
 const app = express();
 
 app.use(morgan('dev'));
-app.use(express.static('public')); // serve static files
 app.use(bodyParser.json()); // parse JSON body
 app.use(cors());
 
 // GET /items   ==>> /35
-app.use('/items', itemRouter);
+app.use('/api/items', itemRouter);
 
-app.use(function (req, res) {
-  res.status(404).json({ message: 'Not Found' });
+// Catch-all 404
+app.use(function (req, res, next) {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
+// Catch-all Error handler
+// Add NODE_ENV check to prevent stacktrace leak
 app.use(function (err, req, res, next) {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something broke!' });
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: app.get('env') === 'development' ? err : {}
+  });
 });
+
 
 // Promisify .listen() and .close()
 app.listenAsync = function (port) {
